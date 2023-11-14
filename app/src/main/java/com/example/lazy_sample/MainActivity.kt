@@ -1,9 +1,12 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+@file:OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
     ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
 )
 
 package com.example.lazy_sample
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +50,6 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
                 ) {
                     Greeting("Android")
                 }
@@ -55,8 +58,27 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(
+    name: String, modifier: Modifier = Modifier
+) {
+
+    Surface(contentColor = Color.Black) {
+        LazyColumn(
+            modifier = Modifier
+                .height(100.dp)
+        ) {
+
+            items(100) { index ->
+                AComponent()
+            }
+        }
+    }
+}
+
+@Composable
+fun AComponent() {
     var expanded by remember { mutableStateOf(false) }
 
     val extraPadding by animateDpAsState(
@@ -69,40 +91,35 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     var text by rememberSaveable {
         mutableStateOf("")
     }
-    Surface(color = Color.Cyan, contentColor = Color.Black) {
-        LazyColumn(modifier = Modifier
-            .height(100.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = extraPadding.coerceAtLeast(0.dp)),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.width(200.dp)) {
+            Text(text = "Hello ${text}")
+            TextField(value = text, onValueChange = { text = it })
+        }
+        Button(
+            onClick = {
+                expanded = !expanded
+            },
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Color.Black
+            )
         ) {
-
-            items(100) { index ->
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    Column(modifier = Modifier.width(100.dp)) {
-                        Text(text = "Hello ${name}")
-                        TextField(value = text, onValueChange = {text = it})
-                    }
-                    Button(
-                        onClick = {
-                                  expanded = !expanded
-                                  },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black
-                        )
-                    ) {
-                        Text(if (expanded) "Show less" else "Show more")
-                    }
-                }
-            }
+            Text(stringResource(id = if (expanded) R.string.show_less else R.string.show_more))
         }
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    uiMode = UI_MODE_NIGHT_YES,
+    name = "Dark"
+)
 @Composable
 fun GreetingPreview() {
     Lazy_sampleTheme {
