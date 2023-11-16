@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.initapp.ui.theme.AppTheme
 import com.example.initapp.ui.theme.InitAppTheme
 import kotlin.random.Random
 
@@ -38,10 +40,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            //LocalAppColor provides AppColor(textColor = Color.Black)
-            CompositionLocalProvider(LocalAppColor.provides(AppColor(textColor = Color.Black))) {
-                Surface(modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background) {
+            Surface(modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background) {
+                AppTheme {
                     MainScreen()
                 }
             }
@@ -52,24 +53,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Header(title: String) {
     Log.e("my_log", "Header")
-    Text(title, style = TextStyle(
-        color = LocalAppColor.current.textColor,
-        fontSize = 24.sp
-    ))
+    Text(title, style = AppTheme.appTypography.largeTitle)
 }
 
 @Composable
 fun Body(content:String, bodyTextColor: Color) {
     Log.e("my_log", "Body")
-    CompositionLocalProvider (LocalAppColor provides
-            LocalAppColor.current.copy(textColor = bodyTextColor)){
         Column {
             Text(text = content,
-                style = TextStyle(color = LocalAppColor.current.textColor))
+                style = AppTheme.appTypography.body)
             Spacer(modifier = Modifier.height(12.dp))
             ImageFeature()
         }
-    }
 }
 
 @Composable
@@ -93,7 +88,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
     Column {
         Header(title = "Composition Local")
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "composition local", color = LocalAppColor.current.textColor)
+        Text(text = "composition local", style = AppTheme.appTypography.subTitle)
         Spacer(modifier = Modifier.height(12.dp))
         Body(content = "Content", bodyTextColor = bodyTextColor)
         Button(onClick = {
@@ -107,14 +102,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    InitAppTheme {
+    AppTheme {
         MainScreen()
     }
 }
 
-data class AppColor(val textColor: Color = Color.Black)
-
-val LocalAppColor = staticCompositionLocalOf { AppColor(textColor = Color.Black) }
 fun GetColor(): Color{
     val listColors = listOf(Color.Blue, Color.Red, Color.Green, Color.Cyan)
     val index = Random.nextInt(0, 4)
